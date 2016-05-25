@@ -6,7 +6,7 @@ port module App exposing (..)
 import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
-import Html.Lazy exposing (lazy)
+import Layout exposing (..)
 import String
 
 
@@ -46,9 +46,7 @@ appUpdate _ model =
 appView : Model -> Html Msg
 appView _ =
     div [ class "container" ]
-        [ div [ class "row" ]
-            [ div [ class "twelve columns" ]
-                [ h1 [] [ text "404finder" ]
-                ]
-            ]
+        [ Layout.header
+        , Layout.form
+        , Layout.footer
         ]
