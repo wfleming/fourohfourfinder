@@ -3,9 +3,13 @@ module Layout exposing (..)
 {-| Layout templates for the app.
 -}
 
+import Model exposing (..)
+import Msg exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Html.Lazy exposing (lazy)
+import Json.Decode as Json
 
 
 header : Html a
@@ -17,10 +21,26 @@ header =
         ]
 
 
-form : Html a
-form =
+
+-- Helper to generate event helper for enter key press
+
+
+onEnter : msg -> msg -> Attribute msg
+onEnter fail success =
+    let
+        tagger code =
+            if code == 13 then
+                success
+            else
+                fail
+    in
+        on "keyup" (Json.map tagger keyCode)
+
+
+form : Model -> Html Msg
+form model =
     div [ class "row" ]
-        [ div [class "twelve columns"]
+        [ div [ class "eight columns" ]
             [ label
                 [ for "start-url"
                 , class "u-inline margin-h"
@@ -33,10 +53,22 @@ form =
                 , name "startUrl"
                 , autofocus True
                 , attribute "type" "url"
+                , on "input" (Json.map UpdateFormUrl targetValue)
+                , onEnter NoOp StartScanning
                 ]
                 []
-            , button [ class "button-primary margin-h" ] [ text "Scan" ]
+            , button
+                [ class "button-primary margin-h"
+                , onClick StartScanning
+                ]
+                [ text "Scan" ]
             ]
+        , div [ class "four columns" ]
+            (if model.isScanning then
+                [ p [] [ text "Scanning..." ] ]
+             else
+                []
+            )
         ]
 
 

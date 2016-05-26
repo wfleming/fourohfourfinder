@@ -3,6 +3,8 @@ port module App exposing (..)
 {-| A web app for finding broken links.
 -}
 
+import Model exposing (..)
+import Msg exposing (..)
 import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
@@ -20,33 +22,37 @@ main =
         }
 
 
-type alias Model =
-    { stuff : List String }
-
-
-emptyModel : Model
-emptyModel =
-    { stuff = [ "thing" ] }
-
-
 appInit : Maybe Model -> ( Model, Cmd Msg )
 appInit _ =
     emptyModel ! []
 
 
-type Msg
-    = NoOp
-
-
 appUpdate : Msg -> Model -> ( Model, Cmd Msg )
-appUpdate _ model =
-    model ! []
+appUpdate msg model =
+    case msg of
+        NoOp ->
+            model ! []
+
+        UpdateFormUrl url ->
+            { model
+                | form =
+                    { url = url }
+                    -- NOTE: elm parser barfs on { model.form | url = url }
+            }
+                ! []
+
+        StartScanning ->
+            -- TODO do stuff
+            { model
+                | isScanning = True
+            }
+                ! []
 
 
 appView : Model -> Html Msg
-appView _ =
+appView model =
     div [ class "container" ]
         [ Layout.header
-        , Layout.form
+        , Layout.form model
         , Layout.footer
         ]
