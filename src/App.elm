@@ -41,13 +41,16 @@ appUpdate msg model =
     StartScanning -> -- TODO do stuff
       { model
       | isScanning = True
+      , siteMap = [ { url = model.form.url, outgoingLinks = [] } ]
       } ! []
 
 
 appView : Model -> Html Msg
 appView model =
   div [ class "container" ]
-    [ Layout.header
-    , Layout.form model
-    , Layout.footer
-    ]
+    ( [ Layout.header
+       , Layout.form model
+      ] ++
+      Layout.results model ++
+      [ Layout.footer ]
+    )

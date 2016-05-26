@@ -10,6 +10,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy exposing (lazy)
 import Json.Decode as Json
+import SiteMap exposing (..)
 
 
 header : Html a
@@ -69,6 +70,16 @@ form model =
        else
         []
       )
+    ]
+
+
+results : Model -> List (Html Msg)
+results model = List.map pageResults model.siteMap
+
+pageResults : PageInfo -> Html Msg
+pageResults page =
+  div [ class "twelve columns" ]
+    [ h3 [] [ text page.url ]
     ]
 
 
