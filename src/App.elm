@@ -14,45 +14,40 @@ import String
 
 main : Program (Maybe Model)
 main =
-    App.programWithFlags
-        { init = appInit
-        , view = appView
-        , update = appUpdate
-        , subscriptions = \_ -> Sub.none
-        }
+  App.programWithFlags
+  { init = appInit
+  , view = appView
+  , update = appUpdate
+  , subscriptions = \_ -> Sub.none
+  }
 
 
 appInit : Maybe Model -> ( Model, Cmd Msg )
 appInit _ =
-    emptyModel ! []
+  emptyModel ! []
 
 
 appUpdate : Msg -> Model -> ( Model, Cmd Msg )
 appUpdate msg model =
-    case msg of
-        NoOp ->
-            model ! []
+  case msg of
+    NoOp ->
+      model ! []
 
-        UpdateFormUrl url ->
-            { model
-                | form =
-                    { url = url }
-                    -- NOTE: elm parser barfs on { model.form | url = url }
-            }
-                ! []
+    UpdateFormUrl url ->
+      { model
+      | form = { url = url } -- NOTE: elm parser barfs on { model.form | url = url }
+      } ! []
 
-        StartScanning ->
-            -- TODO do stuff
-            { model
-                | isScanning = True
-            }
-                ! []
+    StartScanning -> -- TODO do stuff
+      { model
+      | isScanning = True
+      } ! []
 
 
 appView : Model -> Html Msg
 appView model =
-    div [ class "container" ]
-        [ Layout.header
-        , Layout.form model
-        , Layout.footer
-        ]
+  div [ class "container" ]
+    [ Layout.header
+    , Layout.form model
+    , Layout.footer
+    ]

@@ -5,15 +5,15 @@ import SiteMap exposing (..)
 
 
 type alias Model =
-    { isScanning : Bool
-    , form : FormModel
-    , siteMap : SiteMap
-    }
+  { isScanning : Bool
+  , form : FormModel
+  , siteMap : SiteMap
+  }
 
 
 emptyModel : Model
 emptyModel =
-    { isScanning = False
-    , form = { url = "" }
-    , siteMap = []
-    }
+  { isScanning = False
+  , form = { url = "" }
+  , siteMap = []
+  }

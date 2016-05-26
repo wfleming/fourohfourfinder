@@ -2,6 +2,6 @@ module Msg exposing (..)
 
 
 type Msg
-    = NoOp
-    | UpdateFormUrl String
-    | StartScanning
+  = NoOp
+  | UpdateFormUrl String
+  | StartScanning
