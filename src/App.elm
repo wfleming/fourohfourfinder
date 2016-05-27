@@ -4,11 +4,11 @@ port module App exposing (..)
 -}
 
 import Model exposing (..)
-import Msg exposing (..)
+import Msg
 import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
-import Layout exposing (..)
+import Layout
 import String
 
 
@@ -22,30 +22,29 @@ main =
   }
 
 
-appInit : Maybe Model -> ( Model, Cmd Msg )
-appInit _ =
-  emptyModel ! []
+appInit : Maybe Model -> ( Model, Cmd Msg.Msg )
+appInit _ = Model.emptyModel ! []
 
 
-appUpdate : Msg -> Model -> ( Model, Cmd Msg )
+appUpdate : Msg.Msg -> Model -> ( Model, Cmd Msg.Msg )
 appUpdate msg model =
   case msg of
-    NoOp ->
+    Msg.NoOp ->
       model ! []
 
-    UpdateFormUrl url ->
+    Msg.UpdateFormUrl url ->
       { model
       | form = { url = url } -- NOTE: elm parser barfs on { model.form | url = url }
       } ! []
 
-    StartScanning -> -- TODO do stuff
+    Msg.StartScanning -> -- TODO do stuff
       { model
       | isScanning = True
       , siteMap = [ { url = model.form.url, outgoingLinks = [] } ]
       } ! []
 
 
-appView : Model -> Html Msg
+appView : Model -> Html Msg.Msg
 appView model =
   div [ class "container" ]
     ( [ Layout.header
