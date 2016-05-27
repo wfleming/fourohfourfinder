@@ -12,9 +12,9 @@ import Layout
 import String
 
 
-main : Program (Maybe Model)
+main : Program Never
 main =
-  App.programWithFlags
+  App.program
   { init = appInit
   , view = appView
   , update = appUpdate
@@ -22,8 +22,8 @@ main =
   }
 
 
-appInit : Maybe Model -> ( Model, Cmd Msg.Msg )
-appInit _ = Model.emptyModel ! []
+appInit : ( Model, Cmd Msg.Msg )
+appInit = (Model.emptyModel, Cmd.none)
 
 
 appUpdate : Msg.Msg -> Model -> ( Model, Cmd Msg.Msg )
