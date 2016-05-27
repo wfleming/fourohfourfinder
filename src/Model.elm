@@ -3,9 +3,13 @@ port module Model exposing (..)
 import FormModel exposing (..)
 import SiteMap exposing (..)
 
+type alias Status =
+  { message : Maybe String
+  , messageClass : Maybe String
+  }
 
 type alias Model =
-  { isScanning : Bool
+  { status : Status
   , form : FormModel
   , siteMap : SiteMap
   }
@@ -13,7 +17,7 @@ type alias Model =
 
 emptyModel : Model
 emptyModel =
-  { isScanning = False
+  { status = { message = Nothing, messageClass = Nothing }
   , form = { url = "" }
   , siteMap = []
   }

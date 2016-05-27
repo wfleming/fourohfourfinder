@@ -11,6 +11,7 @@ import Html.Attributes exposing (..)
 import Http
 import Layout
 import String
+import Task
 
 
 main : Program Never
@@ -40,19 +41,33 @@ appUpdate msg model =
 
     Msg.StartScanning ->
       let
+        url = Debug.log ("going to scan " ++ model.form.url) model.form.url
         newModel = { model
-                   | isScanning = True
-                   , siteMap = [ { url = model.form.url, outgoingLinks = [] } ]
+                   | status = { message = Just "Scanning..."
+                              , messageClass = Nothing }
+                   , siteMap = [ { url = url, outgoingLinks = [] } ]
                    }
-        task = Task.perform Msg.PageFetched Msg.PageFailed (Http.getString  model.form.url)
+        task = Task.perform Msg.PageFailed Msg.PageFetched (Http.getString url)
       in
         newModel ! [task]
 
     Msg.PageFetched pageSource ->
       model ! []
 
-    Msg.PageFailed Http.Error ->
-      model ! []
+    Msg.PageFailed err ->
+      let
+        errMsg = case err of
+          Http.Timeout -> "Fetch timed out"
+          Http.NetworkError -> "Network error occurred"
+          Http.UnexpectedPayload str -> "Unexpected Payload: " ++ str
+          Http.BadResponse code str -> "Bad Response: " ++ (toString code) ++ " (" ++ str ++ ")"
+
+        newModel = { model
+                   | status = { message = Just errMsg
+                              , messageClass = Just "error" }
+                   }
+      in
+        newModel ! []
 
 
 appView : Model -> Html Msg.Msg

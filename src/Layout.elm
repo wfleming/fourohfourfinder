@@ -65,12 +65,20 @@ form model =
         [ text "Scan" ]
       ]
     , div [ class "four columns" ]
-      (if model.isScanning then
-        [ p [] [ text "Scanning..." ] ]
-       else
-        []
-      )
+        (statusContent model.status)
     ]
+
+statusContent : Status -> List (Html Msg)
+statusContent status =
+  case status.message of
+    Just txt ->
+      let
+        maybeStyle = Maybe.map (\c -> [class c]) status.messageClass
+        style = Maybe.withDefault [] maybeStyle
+      in
+        [ p style [ text txt ] ]
+    Nothing ->
+      []
 
 
 results : Model -> List (Html Msg)
