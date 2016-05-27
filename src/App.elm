@@ -8,6 +8,7 @@ import Msg
 import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
+import Http
 import Layout
 import String
 
@@ -23,7 +24,7 @@ main =
 
 
 appInit : ( Model, Cmd Msg.Msg )
-appInit = (Model.emptyModel, Cmd.none)
+appInit = Model.emptyModel ! []
 
 
 appUpdate : Msg.Msg -> Model -> ( Model, Cmd Msg.Msg )
@@ -37,11 +38,21 @@ appUpdate msg model =
       | form = { url = url } -- NOTE: elm parser barfs on { model.form | url = url }
       } ! []
 
-    Msg.StartScanning -> -- TODO do stuff
-      { model
-      | isScanning = True
-      , siteMap = [ { url = model.form.url, outgoingLinks = [] } ]
-      } ! []
+    Msg.StartScanning ->
+      let
+        newModel = { model
+                   | isScanning = True
+                   , siteMap = [ { url = model.form.url, outgoingLinks = [] } ]
+                   }
+        task = Task.perform Msg.PageFetched Msg.PageFailed (Http.getString  model.form.url)
+      in
+        newModel ! [task]
+
+    Msg.PageFetched pageSource ->
+      model ! []
+
+    Msg.PageFailed Http.Error ->
+      model ! []
 
 
 appView : Model -> Html Msg.Msg
