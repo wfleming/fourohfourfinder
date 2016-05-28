@@ -1,5 +1,9 @@
 {
-  "repository": {},
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wfleming/fourohfourfinder.git"
+  },
   "dependencies": {
     "elm": "^0.17.0",
     "elm-webpack-loader": "^3.0.0"
