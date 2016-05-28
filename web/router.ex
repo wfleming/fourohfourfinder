@@ -19,8 +19,8 @@ defmodule FourOhFourFinderApp.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", FourOhFourFinderApp do
-  #   pipe_through :api
-  # end
+  scope "/api", FourOhFourFinderApp do
+    pipe_through :api
+    post "/page/fetch", Api.PageController, :fetch
+  end
 end
