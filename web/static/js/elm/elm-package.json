@@ -3,10 +3,9 @@
     "summary": "A webcrawler for finding broken links",
     "repository": "https://github.com/wfleming/fourohfourfinder.git",
     "license": "MIT",
-    "source-directories": [
-        "src"
-    ],
+    "source-directories": [ "." ],
     "exposed-modules": [],
+    "native-modules": true,
     "dependencies": {
         "elm-lang/core": "4.0.1 <= v < 5.0.0",
         "elm-lang/html": "1.0.0 <= v < 2.0.0",

@@ -1,7 +1,11 @@
-.PHONY: format clean
+.PHONY: deps clean deploy format
 
-app.js: src/*.elm
-	elm make src/App.elm --output app.js
+deps:
+	mix deps.get
+	npm install
+
+deploy:
+	git push heroku master
 
 format:
 	#elm-format src --yes
