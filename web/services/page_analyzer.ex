@@ -1,18 +1,16 @@
 defmodule FourOhFourFinderApp.PageAnalyzer do
-  require Logger
   use HTTPoison.Base
 
   def analyze(url) do
     case get_with_redirects(url) do
       {:ok, %HTTPoison.Response{status_code: code, body: body}} ->
-        dom_tree = Exquery.tree(body)
         if good_resp?(code) do
           %{
             url: url,
             http_status: code,
             success: true,
-            outgoing_hrefs: tree_hrefs(dom_tree),
-            anchors: tree_ids(dom_tree)
+            outgoing_hrefs: tree_hrefs(body, url),
+            ids: tree_ids(body)
           }
         else
           %{ url: url, http_status: code, success: false }
@@ -42,7 +40,7 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
   end
 
   def redirect_location(headers) do
-    elem(Enum.find(headers, fn({header, val}) -> "Location" == header end), 1)
+    elem(Enum.find(headers, fn({header, _}) -> "Location" == header end), 1)
   end
 
   def good_resp?(code) do
@@ -53,28 +51,39 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
     code >= 300 && code < 400
   end
 
-  def tree_hrefs(tree) do
-    Exquery.Query.all(tree, {:tag, "a", []})
-    |> Enum.map( fn(node) -> node_attr(node, "href") end)
-    |> Enum.filter( fn(val) -> nil != val end)
+  def tree_hrefs(html, url) do
+    html |> Floki.find("a[href]")
+      |> Enum.reject(fn(a) -> is_nil(Enum.at(Floki.attribute(a, "href"), 0)) end)
+      |> Enum.filter(fn(a) -> String.length(Enum.at(Floki.attribute(a, "href"), 0)) > 0 end)
+      |> Enum.map(fn(a) ->
+        %{
+           href: resolve_url(Enum.at(Floki.attribute(a, "href"), 0), url),
+           text: Floki.text(a),
+        }
+      end)
   end
 
-  def tree_ids(tree) do
-    Exquery.Query.all(tree, {:tag, :any, []})
-    |> Enum.map( fn(node) -> node_attr(node, "id") end)
-    |> Enum.filter( fn(val) -> nil != val end)
+  def tree_ids(html) do
+    html |> Floki.find("[id]") |> Floki.attribute("id")
+      |> Enum.reject(&is_nil/1)
   end
 
-  def node_attr(node, attr) do
-    attrs = case node do
-      {_, _, attrs} -> attrs
-      {{_, _, attrs}, _} -> attrs
+  def resolve_url(target, base) do
+    case URI.parse(target) do
+      %{ scheme: nil } -> resolve_path_url(target, base)
+      _ -> target
     end
-    attr = Enum.find(attrs, fn({name, val}) -> name == attr end)
-    if attr do
-      elem(attr, 1)
-    else
-      nil
+  end
+
+  def resolve_path_url(target, base) do
+    base_uri = URI.parse(base)
+    case target do
+      "/" <> _ -> # absolute path on same domain
+        new_uri = %{ base_uri | path: target }
+        URI.to_string(new_uri)
+      _ -> # relative path
+        new_uri = %{ base_uri | path: String.rstrip(base_uri.path, ?/) <> "/" <> target }
+        URI.to_string(base_uri)
     end
   end
 end
