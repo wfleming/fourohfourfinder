@@ -80,14 +80,31 @@ statusContent status =
     Nothing ->
       []
 
+pendingUrls : Model -> List (Html b)
+pendingUrls model =
+  case List.length model.siteMap.pendingUrls of
+    0 -> []
+    _ ->
+      [ div [ class "row" ]
+          [ div [ class "twelve columns" ]
+              [ h3 [] [ text "Pending URLs" ]
+              , ul [] (List.map
+                        (\url -> li [] [ text url ])
+                        model.siteMap.pendingUrls)
+              ]
+          ]
+      ]
 
-results : Model -> List (Html Msg)
-results model = List.map pageResults model.siteMap
+results : Model -> List (Html b)
+results model = List.map pageResults model.siteMap.pageResults
 
-pageResults : PageInfo -> Html Msg
+pageResults : PageResults -> Html b
 pageResults page =
-  div [ class "twelve columns" ]
-    [ h3 [] [ text page.url ]
+  div [ class "row" ]
+    [ div [ class "twelve columns" ]
+        [ h3 [] [ text page.url ]
+        , p [] [ text "Put details here" ]
+        ]
     ]
 
 

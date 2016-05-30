@@ -19,5 +19,5 @@ emptyModel : Model
 emptyModel =
   { status = { message = Nothing, messageClass = Nothing }
   , form = { url = "" }
-  , siteMap = []
+  , siteMap = { pendingUrls = [], pageResults = [] }
   }

@@ -19,7 +19,8 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
       {:error, %HTTPoison.Error{reason: reason}} ->
         %{
           url: url,
-          error: reason
+          error: reason,
+          success: false
         }
     end
   end

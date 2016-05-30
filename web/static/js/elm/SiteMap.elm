@@ -1,21 +1,25 @@
 module SiteMap exposing (..)
 
-import String
-
 
 type alias SiteMap =
-  List PageInfo
-
-
-type alias PageInfo =
-  { url : String
-  , outgoingLinks : List LinkInfo
+  { pendingUrls: List String
+  , pageResults: List PageResults
   }
 
 
-type alias LinkInfo =
-  { target : String
-  , reachable : Bool
+type alias PageResults =
+  { url: String
+  , success: Bool
+  , error: Maybe String
+  , httpStatus: Maybe Int
+  , outgoingLinks: Maybe (List LinkDesc)
+  , ids: Maybe (List String)
+  }
+
+
+type alias LinkDesc =
+  { href: String
+  , text: String
   }
 
 

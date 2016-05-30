@@ -3,6 +3,7 @@ port module App exposing (..)
 {-| A web app for finding broken links.
 -}
 
+import Api
 import Model exposing (..)
 import Msg
 import Html exposing (..)
@@ -10,8 +11,6 @@ import Html.App as App
 import Html.Attributes exposing (..)
 import Http
 import Layout
-import String
-import Task
 
 
 main : Program Never
@@ -41,17 +40,19 @@ appUpdate msg model =
 
     Msg.StartScanning ->
       let
-        url = Debug.log ("going to scan " ++ model.form.url) model.form.url
         newModel = { model
                    | status = { message = Just "Scanning..."
                               , messageClass = Nothing }
-                   , siteMap = [ { url = url, outgoingLinks = [] } ]
+                   , siteMap =
+                       { pendingUrls = [ model.form.url ]
+                       , pageResults = []
+                       }
                    }
-        task = Task.perform Msg.PageFailed Msg.PageFetched (Http.getString url)
+        task = Api.pageFetch model.form.url
       in
         newModel ! [task]
 
-    Msg.PageFetched pageSource ->
+    Msg.PageFetched pageRes ->
       model ! []
 
     Msg.PageFailed err ->
@@ -69,13 +70,13 @@ appUpdate msg model =
       in
         newModel ! []
 
-
 appView : Model -> Html Msg.Msg
 appView model =
   div [ class "container" ]
     ( [ Layout.header
        , Layout.form model
       ] ++
+      Layout.pendingUrls model ++
       Layout.results model ++
       [ Layout.footer ]
     )
