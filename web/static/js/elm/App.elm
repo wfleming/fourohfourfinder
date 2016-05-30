@@ -4,13 +4,14 @@ port module App exposing (..)
 -}
 
 import Api
-import Model exposing (..)
-import Msg
 import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
 import Http
 import Layout
+import Model exposing (..)
+import Msg
+import SiteMap exposing ( normalizeUrl, pageHrefs, siteUrls )
 
 
 main : Program Never
@@ -40,20 +41,44 @@ appUpdate msg model =
 
     Msg.StartScanning ->
       let
+        normalizedUrl = normalizeUrl model.form.url
         newModel = { model
                    | status = { message = Just "Scanning..."
                               , messageClass = Nothing }
                    , siteMap =
-                       { pendingUrls = [ model.form.url ]
+                       { startUrl = normalizedUrl
+                       , pendingUrls = [ normalizedUrl ]
                        , pageResults = []
                        }
                    }
-        task = Api.pageFetch model.form.url
+        task = Api.pageFetch normalizedUrl
       in
         newModel ! [task]
 
     Msg.PageFetched pageRes ->
-      model ! []
+      let
+        curPendingUrls = model.siteMap.pendingUrls
+        curPageResults = model.siteMap.pageResults
+        allUrls = Debug.log "allUrls" <| siteUrls model.siteMap
+        _ = Debug.log "pageRes" <| pageRes
+        newUrls = Debug.log "newUrls" <| List.filter (\href -> not (List.member href allUrls)) (pageHrefs pageRes)
+        --TODO: also filter these by domain: don't crawl the whole web!
+        newPendingUrls =
+          (List.filter (\u -> u /= pageRes.url) curPendingUrls) ++
+          newUrls
+        newModel = { model
+                   | siteMap =
+                     { startUrl = model.siteMap.startUrl
+                     , pendingUrls = newPendingUrls
+                     , pageResults = curPageResults ++ [ pageRes ]
+                     }
+                   }
+        nextTask =
+          case List.head newPendingUrls of
+            Just url -> Api.pageFetch url
+            Nothing -> Cmd.none --TODO: analyze all the collected results for broken links
+      in
+        newModel ! [nextTask]
 
     Msg.PageFailed err ->
       let
@@ -76,7 +101,6 @@ appView model =
     ( [ Layout.header
        , Layout.form model
       ] ++
-      Layout.pendingUrls model ++
-      Layout.results model ++
+      Layout.progressList model ++
       [ Layout.footer ]
     )

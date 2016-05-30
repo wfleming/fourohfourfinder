@@ -6,7 +6,6 @@ import Http
 import Msg
 import Task
 import SiteMap exposing (LinkDesc, PageResults)
-import String
 
 pageFetch : String -> Cmd Msg.Msg
 pageFetch url =
@@ -15,15 +14,16 @@ pageFetch url =
 pageFetchReq : String -> Task.Task Http.Error PageResults
 pageFetchReq url =  Http.post pageInfoDecoder pageFetchUrl (pageFetchBody url)
 
+
 pageInfoDecoder : Json.Decoder PageResults
 pageInfoDecoder =
   Json.object6 PageResults
     ("url" := Json.string)
     ("success" := Json.bool)
-    ("error" := Json.maybe Json.string)
-    ("http_status" := Json.maybe Json.int)
-    ("outgoingLinks" := Json.maybe (Json.list linkDescDecoder))
-    ("ids" := Json.maybe (Json.list Json.string))
+    (Json.maybe ("error" := Json.string))
+    (Json.maybe ("http_status" := Json.int))
+    (Json.maybe ("outgoing_hrefs" := Json.list linkDescDecoder))
+    (Json.maybe ("ids" := Json.list Json.string))
 
 linkDescDecoder : Json.Decoder LinkDesc
 linkDescDecoder =
@@ -35,16 +35,10 @@ linkDescDecoder =
 pageFetchBody : String -> Http.Body
 pageFetchBody url =
   Http.multipart [
-    Http.stringData "url" (normalizeUrl url)
+    Http.stringData "url" url
   ]
 
 pageFetchUrl : String
 pageFetchUrl = "/api/page/fetch"
 
 
-normalizeUrl : String -> String
-normalizeUrl s =
-  if String.startsWith "http" s then
-    s
-  else
-    "http://" ++ s

@@ -10,6 +10,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy exposing (lazy)
 import Json.Decode as Json
+import Set
 import SiteMap exposing (..)
 
 
@@ -80,20 +81,32 @@ statusContent status =
     Nothing ->
       []
 
-pendingUrls : Model -> List (Html b)
-pendingUrls model =
-  case List.length model.siteMap.pendingUrls of
-    0 -> []
-    _ ->
-      [ div [ class "row" ]
-          [ div [ class "twelve columns" ]
-              [ h3 [] [ text "Pending URLs" ]
-              , ul [] (List.map
-                        (\url -> li [] [ text url ])
-                        model.siteMap.pendingUrls)
-              ]
+progressList : Model -> List (Html f)
+progressList  model =
+  let
+    pendingUrlsHtml =
+      case List.length model.siteMap.pendingUrls of
+        0 -> []
+        _ ->
+          [ h3 [] [ text "Pending URLs" ]
+          , ul []
+              (List.map (\url -> li [] [ text url ]) model.siteMap.pendingUrls)
           ]
-      ]
+    fetchedUrlsHtml =
+      case List.length model.siteMap.pageResults of
+        0 -> []
+        _ ->
+          [ h3 [] [ text "Fetched URls" ]
+          , ul []
+              (List.map (\pr -> li [] [ text pr.url ]) model.siteMap.pageResults)
+          ]
+  in
+    [ div [ class "row" ]
+        [ div [ class "twelve columns" ]
+            (pendingUrlsHtml ++ fetchedUrlsHtml)
+        ]
+    ]
+
 
 results : Model -> List (Html b)
 results model = List.map pageResults model.siteMap.pageResults

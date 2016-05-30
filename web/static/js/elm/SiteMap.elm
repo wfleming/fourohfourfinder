@@ -1,8 +1,11 @@
 module SiteMap exposing (..)
 
+import String
+
 
 type alias SiteMap =
-  { pendingUrls: List String
+  { startUrl: String
+  , pendingUrls: List String
   , pageResults: List PageResults
   }
 
@@ -23,7 +26,22 @@ type alias LinkDesc =
   }
 
 
+siteUrls : SiteMap -> List String
+siteUrls sitemap = sitemap.pendingUrls ++ (List.map (\p -> p.url) sitemap.pageResults)
 
+
+pageHrefs : PageResults -> List String
+pageHrefs page = case page.outgoingLinks of
+  Just linkList -> List.map (\l -> l.href) linkList
+  Nothing -> []
+
+
+normalizeUrl : String -> String
+normalizeUrl s =
+  if String.startsWith "http" s then
+    s
+  else
+    "http://" ++ s
 {-
    When part of the model I get a compile error about "Your `main` is demanding an unsupported type as a flag."
    Kind of a bummer if you can't use a real type in an app model
