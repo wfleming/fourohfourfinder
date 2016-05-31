@@ -30,7 +30,7 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
     case get(url) do
       {:ok, response} ->
         if redirect?(response.status_code) do
-          get_with_redirects(redirect_location(response.headers))
+          get_with_redirects(resolve_url(redirect_location(response.headers), url))
         else
           {:ok, response}
         end
