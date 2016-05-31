@@ -11,7 +11,7 @@ import Http
 import Layout
 import Model exposing (..)
 import Msg
-import SiteMap exposing ( normalizeUrl, pageHrefs, siteUrls )
+import SiteMap exposing ( normalizeUrl, urlOnSite, pageHrefs, siteUrls )
 
 
 main : Program Never
@@ -59,13 +59,13 @@ appUpdate msg model =
       let
         curPendingUrls = model.siteMap.pendingUrls
         curPageResults = model.siteMap.pageResults
-        allUrls = Debug.log "allUrls" <| siteUrls model.siteMap
-        _ = Debug.log "pageRes" <| pageRes
-        newUrls = Debug.log "newUrls" <| List.filter (\href -> not (List.member href allUrls)) (pageHrefs pageRes)
-        --TODO: also filter these by domain: don't crawl the whole web!
+        allUrls = siteUrls model.siteMap
+        newUrls = List.filter (\href -> not (List.member href allUrls)) (pageHrefs pageRes)
+        --TODO: loosen filter by domain: We do want results for sites we link to
+        eligibleNewUrls = List.filter (urlOnSite model.siteMap) newUrls
         newPendingUrls =
           (List.filter (\u -> u /= pageRes.url) curPendingUrls) ++
-          newUrls
+          eligibleNewUrls
         newModel = { model
                    | siteMap =
                      { startUrl = model.siteMap.startUrl

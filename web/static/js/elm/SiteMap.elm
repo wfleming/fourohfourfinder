@@ -1,5 +1,6 @@
 module SiteMap exposing (..)
 
+import URI
 import String
 
 
@@ -25,6 +26,14 @@ type alias LinkDesc =
   , text: String
   }
 
+
+urlOnSite : SiteMap -> String -> Bool
+urlOnSite sitemap url =
+  let
+    siteUrl = URI.parse sitemap.startUrl
+    targetUrl = URI.parse url
+  in
+    siteUrl.hostname == targetUrl.hostname
 
 siteUrls : SiteMap -> List String
 siteUrls sitemap = sitemap.pendingUrls ++ (List.map (\p -> p.url) sitemap.pageResults)
