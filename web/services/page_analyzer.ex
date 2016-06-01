@@ -4,13 +4,14 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
   def analyze(url) do
     case get_with_redirects(url) do
       {:ok, %HTTPoison.Response{status_code: code, body: body}} ->
+        html = Floki.parse(body)
         if good_resp?(code) do
           %{
             url: url,
             http_status: code,
             success: true,
-            outgoing_hrefs: tree_hrefs(body, url),
-            ids: tree_ids(body)
+            outgoing_hrefs: tree_hrefs(html, url),
+            ids: tree_ids(html)
           }
         else
           %{ url: url, http_status: code, success: false }
