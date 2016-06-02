@@ -105,7 +105,6 @@ appUpdate msg model =
 
     Msg.StartAnalyzing ->
       let
-        _ = Debug.log "got StartAnalyzing message" model
         newModel = { model
                    | status = { message = Just "Analyzing..."
                               , messageClass = Nothing }
