@@ -113,13 +113,22 @@ progressList  model =
 analysisResults : Model -> List (Html a)
 analysisResults model =
   let
+    goodLinksCount = List.sum <| List.map (\pa -> pa.goodLinksCount) model.siteAnalysis
+    badLinksCount = List.sum <| List.map (\pa -> List.length pa.badLinks) model.siteAnalysis
+    pagesCount = List.length model.siteAnalysis
     resultsHtml = List.map pageAnalysis model.siteAnalysis
   in
     if List.length resultsHtml > 0 then
       ( div [ class "row" ]
           [ div [ class "twelve columns" ]
               [ h3 [] [ text "Site Results" ]
-              , p [] [ text <| "Inspected " ++ (toString <| List.length resultsHtml) ++ " pages" ]
+              , p []
+                  [ text "Found "
+                  , span [ class "t-red" ] [ text <| (toString badLinksCount) ++ " broken links" ]
+                  , text " and "
+                  , span [ class "t-green" ] [ text <| (toString goodLinksCount) ++ " good links" ]
+                  , text <| " on " ++ (toString pagesCount) ++ " pages."
+                  ]
               ]
           ]
       ) :: resultsHtml
