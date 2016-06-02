@@ -25,6 +25,7 @@ defmodule FourOhFourFinderApp.Web do
   def controller do
     quote do
       use Phoenix.Controller, namespace: FourOhFourFinderApp
+      plug NewRelixir.Plug.Phoenix
 
       import FourOhFourFinderApp.Router.Helpers
       import FourOhFourFinderApp.Gettext

@@ -18,7 +18,8 @@ defmodule FourOhFourFinderApp.Mixfile do
   def application do
     [mod: {FourOhFourFinderApp, []},
      applications: [
-       :phoenix, :phoenix_html, :cowboy, :logger, :gettext, :httpoison, :raygun, :tzdata
+       :phoenix, :phoenix_html, :cowboy, :logger, :gettext, :httpoison, :raygun,
+       :tzdata, :new_relixir
      ]
     ]
   end
@@ -35,6 +36,7 @@ defmodule FourOhFourFinderApp.Mixfile do
      {:floki, "~> 0.8.1"},
      {:gettext, "~> 0.9"},
      {:httpoison, "~> 0.8.0"},
+     {:new_relixir, "~> 0.1.0"},
      {:phoenix_html, "~> 2.4"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:phoenix, "~> 1.1.4"},
