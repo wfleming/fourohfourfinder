@@ -44,6 +44,15 @@ pageHrefs page = case page.outgoingLinks of
   Just linkList -> List.map (\l -> l.href) linkList
   Nothing -> []
 
+dropHash : String -> String
+dropHash s =
+  let
+    origURI = URI.parse s
+    uri = { origURI
+          | hash = Nothing }
+  in
+    URI.toString uri
+
 
 normalizeUrl : String -> String
 normalizeUrl s =

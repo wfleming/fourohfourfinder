@@ -8,10 +8,9 @@ import Msg exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.Lazy exposing (lazy)
+--import Html.Lazy exposing (lazy)
 import Json.Decode as Json
-import Set
-import SiteMap exposing (..)
+import SiteAnalysis exposing (..)
 
 
 header : Html a
@@ -96,29 +95,60 @@ progressList  model =
       case List.length model.siteMap.pageResults of
         0 -> []
         _ ->
-          [ h3 [] [ text "Fetched URls" ]
+          [ h3 [] [ text "Fetched URLs" ]
           , ul []
               (List.map (\pr -> li [] [ text pr.url ]) model.siteMap.pageResults)
           ]
   in
-    [ div [ class "row" ]
-        [ div [ class "twelve columns" ]
-            (pendingUrlsHtml ++ fetchedUrlsHtml)
-        ]
-    ]
+    if List.length pendingUrlsHtml > 0 || List.length fetchedUrlsHtml > 0 then
+      [ div [ class "row" ]
+          [ div [ class "twelve columns" ]
+              (pendingUrlsHtml ++ fetchedUrlsHtml)
+          ]
+      ]
+    else
+      []
 
 
-results : Model -> List (Html b)
-results model = List.map pageResults model.siteMap.pageResults
+analysisResults : Model -> List (Html a)
+analysisResults model =
+  let
+    resultsHtml = List.map pageAnalysis model.siteAnalysis
+  in
+    if List.length resultsHtml > 0 then
+      ( div [ class "row" ]
+          [ div [ class "twelve columns" ]
+              [ h3 [] [ text "Site Results" ]
+              , p [] [ text <| "Inspected " ++ (toString <| List.length resultsHtml) ++ " pages" ]
+              ]
+          ]
+      ) :: resultsHtml
+    else
+      []
 
-pageResults : PageResults -> Html b
-pageResults page =
-  div [ class "row" ]
-    [ div [ class "twelve columns" ]
-        [ h3 [] [ text page.url ]
-        , p [] [ text "Put details here" ]
-        ]
-    ]
+pageAnalysis : PageAnalysis -> Html b
+pageAnalysis page =
+  let
+    badLinkLis =
+      List.map
+        (\bl -> li [ class "t-red" ]
+                  [ code [] [ text bl.link.text ]
+                  , text " (linking to "
+                  , code [] [ text bl.link.href ]
+                  , text <| "failed because " ++ bl.reason
+                  ]
+        )
+        page.badLinks
+  in
+    div [ class "row" ]
+      [ div [ class "twelve columns" ]
+          [ h4 [] [ code [] [ text page.url ] ]
+          , ul []
+              (li [ class "t-green" ]
+                  [ text <| (toString page.goodLinksCount) ++ " perfectly good links." ]
+              :: badLinkLis)
+          ]
+      ]
 
 
 footer : Html a

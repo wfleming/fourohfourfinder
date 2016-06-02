@@ -1,6 +1,7 @@
 port module Model exposing (..)
 
 import FormModel exposing (..)
+import SiteAnalysis exposing (..)
 import SiteMap exposing (..)
 
 type alias Status =
@@ -11,13 +12,20 @@ type alias Status =
 type alias Model =
   { status : Status
   , form : FormModel
+  , siteAnalysis: SiteAnalysis
   , siteMap : SiteMap
   }
 
+emptyStatus : Status
+emptyStatus = { message = Nothing, messageClass = Nothing }
+
+emptySiteMap : SiteMap
+emptySiteMap = { startUrl = "", pendingUrls = [], pageResults = [] }
 
 emptyModel : Model
 emptyModel =
-  { status = { message = Nothing, messageClass = Nothing }
+  { status = emptyStatus
   , form = { url = "" }
-  , siteMap = { pendingUrls = [], pageResults = [] }
+  , siteAnalysis = []
+  , siteMap = emptySiteMap
   }

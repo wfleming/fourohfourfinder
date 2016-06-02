@@ -84,8 +84,8 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
         new_uri = %{ base_uri | path: target }
         URI.to_string(new_uri)
       _ -> # relative path
-        new_uri = %{ base_uri | path: String.rstrip(base_uri.path, ?/) <> "/" <> target }
-        URI.to_string(base_uri)
+        new_uri = %{ base_uri | path: String.rstrip(base_uri.path || "", ?/) <> "/" <> target }
+        URI.to_string(new_uri)
     end
   end
 end

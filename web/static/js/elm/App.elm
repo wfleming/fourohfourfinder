@@ -11,7 +11,8 @@ import Http
 import Layout
 import Model exposing (..)
 import Msg
-import SiteMap exposing ( normalizeUrl, urlOnSite, pageHrefs, siteUrls )
+import SiteAnalysis
+import SiteMap exposing ( dropHash, normalizeUrl, urlOnSite, pageHrefs, siteUrls )
 
 
 main : Program Never
@@ -60,9 +61,15 @@ appUpdate msg model =
         curPendingUrls = model.siteMap.pendingUrls
         curPageResults = model.siteMap.pageResults
         allUrls = siteUrls model.siteMap
-        newUrls = List.filter (\href -> not (List.member href allUrls)) (pageHrefs pageRes)
-        --TODO: loosen filter by domain: We do want results for sites we link to
-        eligibleNewUrls = List.filter (urlOnSite model.siteMap) newUrls
+        hashlessUrls = List.map dropHash (pageHrefs pageRes)
+        newUrls = List.filter (\href -> not (List.member href allUrls)) hashlessUrls
+        eligibleNewUrls =
+          if urlOnSite model.siteMap pageRes.url then
+            -- we'll follow links off-site one hop to check those links
+            newUrls
+          else
+            -- if this a result from off-site, we don't follow links further
+            List.filter (urlOnSite model.siteMap) newUrls
         newPendingUrls =
           (List.filter (\u -> u /= pageRes.url) curPendingUrls) ++
           eligibleNewUrls
@@ -73,10 +80,11 @@ appUpdate msg model =
                      , pageResults = curPageResults ++ [ pageRes ]
                      }
                    }
+        -- TODO: batch HTTP by returning all new tasks
         nextTask =
           case List.head newPendingUrls of
             Just url -> Api.pageFetch url
-            Nothing -> Cmd.none --TODO: analyze all the collected results for broken links
+            Nothing -> Msg.buildCmd Msg.StartAnalyzing
       in
         newModel ! [nextTask]
 
@@ -95,6 +103,28 @@ appUpdate msg model =
       in
         newModel ! []
 
+    Msg.StartAnalyzing ->
+      let
+        _ = Debug.log "got StartAnalyzing message" model
+        newModel = { model
+                   | status = { message = Just "Analyzing..."
+                              , messageClass = Nothing }
+                   }
+
+      in
+        newModel ! [Msg.buildCmd Msg.DoAnalyzing]
+
+    Msg.DoAnalyzing ->
+      let
+        newModel = { model
+                   | siteAnalysis = SiteAnalysis.build model.siteMap
+                   , siteMap = emptySiteMap
+                   , status = { message = Just "Finished"
+                            , messageClass = Nothing }
+                   }
+      in
+        newModel ! []
+
 appView : Model -> Html Msg.Msg
 appView model =
   div [ class "container" ]
@@ -102,5 +132,6 @@ appView model =
        , Layout.form model
       ] ++
       Layout.progressList model ++
+      Layout.analysisResults model ++
       [ Layout.footer ]
     )

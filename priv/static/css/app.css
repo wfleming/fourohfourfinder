@@ -8,6 +8,14 @@
   margin: 0 0.5rem;
 }
 
+.t-green {
+  color: #228B22;
+}
+
+.t-red {
+  color: #DC143C;
+}
+
 /* Specific Element Overrides
 -------------------------------------------------------------------------*/
 #start-url {
