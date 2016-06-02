@@ -18,4 +18,4 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 ## Production
 
-On [Heroku](https://fourohfourfinderfinder.herokuapp.com/) thanks to [this example](https://github.com/joshuaclayton/phoenix_elm_webpack_heroku_example_app).
+On [Heroku](https://fourohfourtracker.herokuapp.com/) thanks to [this example](https://github.com/joshuaclayton/phoenix_elm_webpack_heroku_example_app).
