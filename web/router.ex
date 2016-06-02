@@ -12,7 +12,7 @@ defmodule FourOhFourFinderApp.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug FourOhFourFinderApp.RateLimit, max_requests: 120, interval_seconds: 60
+    plug FourOhFourFinderApp.RateLimit, max_requests: 400, interval_seconds: 60
   end
 
   scope "/", FourOhFourFinderApp do
