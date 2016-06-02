@@ -135,7 +135,7 @@ pageAnalysis page =
                   [ code [] [ text bl.link.text ]
                   , text " (linking to "
                   , code [] [ text bl.link.href ]
-                  , text <| "failed because " ++ bl.reason
+                  , text <| ") failed because " ++ bl.reason
                   ]
         )
         page.badLinks
