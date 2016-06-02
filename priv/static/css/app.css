@@ -18,6 +18,27 @@
 
 /* Specific Element Overrides
 -------------------------------------------------------------------------*/
+html, body {
+  height: 100%;
+}
+
+.container {
+  min-height: 100%;
+}
+
 #start-url {
   width: 30rem;
+}
+
+section#main-content {
+  padding-bottom: 4rem;
+}
+
+footer {
+  bottom: 0;
+  height: 4rem;
+  padding-top: 1rem;
+  position: absolute;
+  text-align: center;
+  width: 100%;
 }

@@ -154,8 +154,7 @@ pageAnalysis page =
 footer : Html a
 footer =
   Html.footer [ class "row" ]
-    [ p []
-      [ text "By "
-      , a [ href "https://github.com/wfleming" ] [ text "Will Fleming" ]
-      ]
+    [
+      a [ href "https://github.com/wfleming/fourohfourfinder" ]
+        [ text "Source on GitHub" ]
     ]

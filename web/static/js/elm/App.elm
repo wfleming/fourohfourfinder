@@ -127,10 +127,11 @@ appUpdate msg model =
 appView : Model -> Html Msg.Msg
 appView model =
   div [ class "container" ]
-    ( [ Layout.header
-       , Layout.form model
-      ] ++
-      Layout.progressList model ++
-      Layout.analysisResults model ++
-      [ Layout.footer ]
+    ( [ section [ id "main-content" ]
+        ([ Layout.header
+          , Layout.form model
+         ] ++
+         Layout.progressList model ++
+         Layout.analysisResults model)
+      , Layout.footer ]
     )
