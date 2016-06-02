@@ -19,7 +19,7 @@ defmodule FourOhFourFinderApp.Mixfile do
     [mod: {FourOhFourFinderApp, []},
      applications: [
        :phoenix, :phoenix_html, :cowboy, :logger, :gettext, :httpoison, :raygun,
-       :tzdata, :new_relixir
+       :tzdata, :new_relixir, :ex_rated
      ]
     ]
   end
@@ -33,6 +33,7 @@ defmodule FourOhFourFinderApp.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [{:cowboy, "~> 1.0"},
+     {:ex_rated, "~> 1.2"},
      {:floki, "~> 0.8.1"},
      {:gettext, "~> 0.9"},
      {:httpoison, "~> 0.8.0"},
