@@ -1,19 +1,28 @@
 defmodule FourOhFourFinderApp.PageAnalyzer do
   use HTTPoison.Base
-  require Logger
 
   def analyze(url) do
     case get_with_redirects(url) do
-      {:ok, %HTTPoison.Response{status_code: code, body: body}} ->
-        html = Floki.parse(body)
+      {:ok, response = %HTTPoison.Response{status_code: code, body: body}} ->
         if good_resp?(code) do
-          %{
-            url: url,
-            http_status: code,
-            success: true,
-            outgoing_hrefs: tree_hrefs(html, url),
-            ids: tree_ids(html)
-          }
+          if is_html(response) do
+            html = Floki.parse(body)
+            %{
+              url: url,
+              http_status: code,
+              success: true,
+              outgoing_hrefs: tree_hrefs(html, url),
+              ids: tree_ids(html)
+            }
+          else
+            %{
+              url: url,
+              http_status: code,
+              success: true,
+              outgoing_hrefs: [],
+              ids: []
+            }
+          end
         else
           %{ url: url, http_status: code, success: false }
         end
@@ -32,8 +41,7 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
     case get(url) do
       {:ok, response} ->
         if redirect?(response.status_code) do
-          Logger.debug("will redirect " <> redirect_location(response.headers))
-          get_with_redirects(resolve_url(redirect_location(response.headers), url))
+          get_with_redirects(resolve_url(get_header(response.headers, "Location"), url))
         else
           {:ok, response}
         end
@@ -43,8 +51,12 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
     end
   end
 
-  def redirect_location(headers) do
-    elem(Enum.find(headers, fn({header, _}) -> "location" == String.downcase(header) end), 1)
+  def is_html(response) do
+    String.starts_with?(get_header(response.headers, "content-type"), "text/html")
+  end
+
+  def get_header(headers, header_name) do
+    elem(Enum.find(headers, fn({header, _}) -> String.downcase(header_name) == String.downcase(header) end), 1)
   end
 
   def good_resp?(code) do
