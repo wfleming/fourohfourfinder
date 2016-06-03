@@ -1,6 +1,6 @@
 defmodule FourOhFourFinderApp.Router do
   use FourOhFourFinderApp.Web, :router
-  use Raygun.Plug
+  use Raygun.Plug, user: fn(conn) -> %{} end
 
   pipeline :browser do
     plug :accepts, ["html"]
