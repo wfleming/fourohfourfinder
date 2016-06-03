@@ -1,5 +1,6 @@
 defmodule FourOhFourFinderApp.PageAnalyzer do
   use HTTPoison.Base
+  require Logger
 
   def analyze(url) do
     case get_with_redirects(url) do
@@ -31,6 +32,7 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
     case get(url) do
       {:ok, response} ->
         if redirect?(response.status_code) do
+          Logger.debug("will redirect " <> redirect_location(response.headers))
           get_with_redirects(resolve_url(redirect_location(response.headers), url))
         else
           {:ok, response}
@@ -42,7 +44,7 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
   end
 
   def redirect_location(headers) do
-    elem(Enum.find(headers, fn({header, _}) -> "Location" == header end), 1)
+    elem(Enum.find(headers, fn({header, _}) -> "location" == String.downcase(header) end), 1)
   end
 
   def good_resp?(code) do
