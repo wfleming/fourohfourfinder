@@ -74,7 +74,7 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
       |> Enum.map(fn(a) ->
         %{
            href: resolve_url(Enum.at(Floki.attribute(a, "href"), 0), url),
-           text: Floki.text(a),
+           text: sanitize_str(Floki.text(a)),
         }
       end)
   end
@@ -100,6 +100,14 @@ defmodule FourOhFourFinderApp.PageAnalyzer do
       _ -> # relative path
         new_uri = %{ base_uri | path: String.rstrip(base_uri.path || "", ?/) <> "/" <> target }
         URI.to_string(new_uri)
+    end
+  end
+
+  def sanitize_str(str) do
+    if String.valid?(str) do
+      str
+    else
+      Enum.join(for <<b <- str>>, do: <<b::utf8>>)
     end
   end
 end
